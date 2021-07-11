@@ -29,11 +29,8 @@ def simulate_physics(position, velocity, acceleration, delta_time):
     velocity = velocity + (acceleration * delta_time)
     return position, velocity
 
-windowSurface.fill(WHITE)
-win_orig = windowSurface
-
 while True:
-    windowSurface = win_orig
+    windowSurface.fill(WHITE)
     pygame.draw.circle(windowSurface, BLACK , (250,y), radius, 0)
 
     y, velocity = simulate_physics(y, velocity, acceleration, del_t)
