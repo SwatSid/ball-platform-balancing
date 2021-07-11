@@ -23,15 +23,21 @@ y= radius
 down_direction_flag = True
 del_t = 0.005
 
-while True:
-    windowSurface.fill(WHITE)
-    pygame.draw.circle(windowSurface, BLACK , (250,y), radius, 0)
-##    sleep(.006)
+def simulate_physics(position, velocity, acceleration, delta_time):
 
-    y = y + (velocity * del_t) + (acceleration * del_t**2)/2
-    velocity = velocity + (acceleration * del_t)
+    position = position + (velocity * delta_time) + (acceleration * delta_time**2)/2
+    velocity = velocity + (acceleration * delta_time)
+    return position, velocity
+
+windowSurface.fill(WHITE)
+win_orig = windowSurface
+
+while True:
+    windowSurface = win_orig
+    pygame.draw.circle(windowSurface, BLACK , (250,y), radius, 0)
+
+    y, velocity = simulate_physics(y, velocity, acceleration, del_t)
     
-##    print(velocity)
     if (y > sh - radius) or (y < radius):
         velocity = - velocity
 
