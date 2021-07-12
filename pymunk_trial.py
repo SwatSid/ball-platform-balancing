@@ -24,10 +24,25 @@ def draw_collision(arbiter, space, data):
         pygame.draw.circle(data["surface"], pygame.Color("black"), p, r, 1)
 
 
+def spawn_ball(mass, radius, position, friction):
+    """
+    Return the body and shape objects of a ball obtained given inputs mass, radius, position and friction
+    """
+    inertia = pymunk.moment_for_circle(mass, 0, radius, (0, 0))
+    body = pymunk.Body(mass, inertia)
+    body.position = position
+    
+    shape = pymunk.Circle(body, radius, (0, 0))
+    shape.friction = friction
+    
+    return body, shape
+    
 def main():
 
     pygame.init()
-    screen = pygame.display.set_mode((600, 600))
+    screen_width = 900
+    screen_height = 600
+    screen = pygame.display.set_mode((screen_width, screen_height))
     clock = pygame.time.Clock()
     running = True
 
@@ -44,14 +59,15 @@ def main():
 
     ### walls
     static_lines = [
-        pymunk.Segment(space.static_body, (11.0, 280.0), (407.0, 300.0), 0.0),
-        pymunk.Segment(space.static_body, (407.0, 246.0), (407.0, 343.0), 0.0),
+        pymunk.Segment(space.static_body, \
+            (screen_width/2 - 200, screen_height/2), \
+            (screen_width/2 + 200, screen_height/2), 0.0)
     ]
+    
+    print((screen_width - 200, screen_height/2))
     for l in static_lines:
         l.friction = 0.5
     space.add(*static_lines)
-
-##    ticks_to_next_ball = 0
 
     ch = space.add_collision_handler(0, 0)
     ch.data["surface"] = screen
@@ -59,12 +75,13 @@ def main():
 
     mass = 0.1
     radius = 25
-    inertia = pymunk.moment_for_circle(mass, 0, radius, (0, 0))
-    body = pymunk.Body(mass, inertia)
-    x = random.randint(115, 350)
-    body.position = x, 400
-    shape = pymunk.Circle(body, radius, (0, 0))
-    shape.friction = 0.5
+    position = random.randint(115, 350), 400 # Tuple of x, y | x is a random number ranging between values to randomize its initial spawn location
+    friction = 0.5
+    
+    
+    body, shape = spawn_ball(mass, radius, position, friction)
+    
+    
     space.add(body, shape)
     balls.append(shape)
             
@@ -77,19 +94,6 @@ def main():
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_p:
                 pygame.image.save(screen, "contact_with_friction.png")
 
-##        ticks_to_next_ball = 1
-##        if ticks_to_next_ball <= 0:
-##            ticks_to_next_ball = 100
-##            mass = 0.1
-##            radius = 25
-##            inertia = pymunk.moment_for_circle(mass, 0, radius, (0, 0))
-##            body = pymunk.Body(mass, inertia)
-##            x = random.randint(115, 350)
-##            body.position = x, 400
-##            shape = pymunk.Circle(body, radius, (0, 0))
-##            shape.friction = 0.5
-##            space.add(body, shape)
-##            balls.append(shape)
 
         ### Clear screen
         screen.fill(pygame.Color("white"))
