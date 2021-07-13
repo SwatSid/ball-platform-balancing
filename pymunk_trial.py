@@ -57,17 +57,18 @@ def main():
     ## Balls
     balls = []
 
-    ### walls
-    static_lines = [
-        pymunk.Segment(space.static_body, \
-            (screen_width/2 - 200, screen_height/2), \
-            (screen_width/2 + 200, screen_height/2), 0.0)
-    ]
+    ### control platform
+    control_body = pymunk.Body(body_type=pymunk.Body.KINEMATIC)
+    control_body.position = screen_width/2, screen_height/2
     
-    print((screen_width - 200, screen_height/2))
-    for l in static_lines:
-        l.friction = 0.5
-    space.add(*static_lines)
+    # print(control_body.position)
+    
+    control_shape = pymunk.Segment(control_body, \
+            (-200, 0), \
+            (200, 0), 0.0)
+    
+    space.add(control_body, control_shape)
+    
 
     ch = space.add_collision_handler(0, 0)
     ch.data["surface"] = screen
@@ -75,16 +76,20 @@ def main():
 
     mass = 0.1
     radius = 25
-    position = random.randint(115, 350), 400 # Tuple of x, y | x is a random number ranging between values to randomize its initial spawn location
+    position_x = random.randint(screen_width/2 - 200, screen_width/2 + 200)
+    position_y = screen_height/2 + radius + 1
+    position = position_x, position_y # Tuple of x, y | x is a random number ranging between values to randomize its initial spawn location
     friction = 0.5
-    
     
     body, shape = spawn_ball(mass, radius, position, friction)
     
     
     space.add(body, shape)
     balls.append(shape)
-            
+    
+    
+    
+    
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -100,7 +105,9 @@ def main():
 
         ### Draw stuff
         space.debug_draw(draw_options)
-
+        
+        # control_body.angle = control_body.angle + 0.01
+        
         balls_to_remove = []
         for ball in balls:
             if ball.body.position.y < 200:
