@@ -14,14 +14,27 @@ from pymunk import Vec2d
 
 pymunk.pygame_util.positive_y_is_up = True
 
+screen_width = 900
+screen_height = 600
+error = 0
 
 def draw_collision(arbiter, space, data):
-    for c in arbiter.contact_point_set.points:
-        r = max(3, abs(c.distance * 5))
-        r = int(r)
+    global error
+    
+    center_of_platform = (screen_width/2, screen_height/2)
+    center_of_platform_vector = Vec2d(center_of_platform[0], center_of_platform[1])
+    
+    
+    contact_point = arbiter.contact_point_set.points[0].point_a
+    print(center_of_platform_vector - contact_point)
+    error = contact_point.get_distance(center_of_platform)
+    # for c in arbiter.contact_point_set.points:
+        # print(c)
+        # r = max(3, abs(c.distance * 5))
+        # r = int(r)
 
-        p = pymunk.pygame_util.to_pygame(c.point_a, data["surface"])
-        pygame.draw.circle(data["surface"], pygame.Color("black"), p, r, 1)
+        # p = pymunk.pygame_util.to_pygame(c.point_a, data["surface"])
+        # pygame.draw.circle(data["surface"], pygame.Color("black"), p, r, 1)
 
 
 def spawn_ball(mass, radius, position, friction):
@@ -41,8 +54,7 @@ def main():
     
     if __debug__:
         pygame.init()
-    screen_width = 900
-    screen_height = 600
+    
     if __debug__:
         screen = pygame.display.set_mode((screen_width, screen_height))
         clock = pygame.time.Clock()
@@ -67,6 +79,7 @@ def main():
             (+platform_length/2, 0), 0.0)
     
     space.add(control_body, control_shape)
+    
     
     if __debug__:
         ch = space.add_collision_handler(0, 0)
@@ -125,7 +138,11 @@ def main():
             pygame.display.flip()
             clock.tick(50)
             pygame.display.set_caption("fps: " + str(clock.get_fps()))
-
+        
+        # left = control_body.local_to_world((-200,0))
+        # right = control_body.local_to_world((+200,0))
+        # print(error)
+        # print("Left end pt : ", left.x, left.y ," Right end pt : ", right.x, right.y)
 
 if __name__ == "__main__":
     sys.exit(main())
